@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 
 # ── PAGE CONFIG ──────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Multi-Channel Marketing Analytics | Grito Lab",
+    page_title="Multi-Channel Marketing & ROI Analytics | Grito Lab",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
