@@ -311,20 +311,21 @@ with tab1:
     overall_roas  = total_revenue / max(total_budget, 1)
     overall_cpa   = total_budget / max(total_conv, 1)
     overall_ctr   = total_clicks / max(total_impr, 1) * 100
+    
     with st.expander("📋 Executive Summary", expanded=True):
 
-    st.success(
+        st.success(
         f"""
-        Revenue: ₹{total_revenue:,.0f}
+    Revenue: ₹{total_revenue:,.0f}
 
-        Spend: ₹{total_budget:,.0f}
+    Spend: ₹{total_budget:,.0f}
 
-        ROAS: {overall_roas:.2f}x
+    ROAS: {overall_roas:.2f}x
 
-        Conversions: {total_conv:,}
+    Conversions: {total_conv:,}
 
-        CTR: {overall_ctr:.2f}%
-        """
+    CTR: {overall_ctr:.2f}%
+    """
     )
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
