@@ -1,4 +1,4 @@
-# 📊 Multi-Channel Marketing Attribution & ROI Analytics
+# 📊 Multi-Channel Marketing Attribution & ROI Analytics - Grito Labs Analytics
 
 An interactive marketing analytics platform designed to evaluate multi-channel campaign performance, compare attribution models, and generate actionable budget optimization recommendations.
 
