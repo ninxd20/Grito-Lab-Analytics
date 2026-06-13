@@ -1089,7 +1089,8 @@ with tab6:
     )
 
     if overall_roas > 4:
-    st.balloons()
+        st.balloons()
+        st.success("Excellent ROAS Performance!")
     
 # ── FOOTER ────────────────────────────────────────────────────────────────────
 st.divider()
