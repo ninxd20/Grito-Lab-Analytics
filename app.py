@@ -225,32 +225,8 @@ def load_all_data():
 
 uploaded_file = st.sidebar.file_uploader(
     "📂 Upload Marketing Dataset",
-    type=["csv"]
-)
-
-if uploaded_file is not None:
-
-    df_all = pd.read_csv(uploaded_file)
-
-    st.sidebar.success(
-        f"✅ {uploaded_file.name} uploaded successfully!"
-    )
-
-    st.sidebar.caption(
-        f"Rows: {len(df_all):,} | Columns: {len(df_all.columns)}"
-    )
-
-else:
-
-    df_all = load_all_data()
-
-    st.sidebar.info(
-        "Using built-in demo dataset"
-    )
-
-uploaded_file = st.sidebar.file_uploader(
-    "📂 Upload Marketing Dataset",
-    type=["csv"]
+    type=["csv"],
+    key="marketing_dataset"
 )
 
 if uploaded_file is not None:
