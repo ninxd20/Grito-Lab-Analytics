@@ -229,9 +229,71 @@ uploaded_file = st.sidebar.file_uploader(
 )
 
 if uploaded_file is not None:
+
     df_all = pd.read_csv(uploaded_file)
+
+    st.sidebar.success(
+        f"✅ {uploaded_file.name} uploaded successfully!"
+    )
+
+    st.sidebar.caption(
+        f"Rows: {len(df_all):,} | Columns: {len(df_all.columns)}"
+    )
+
 else:
+
     df_all = load_all_data()
+
+    st.sidebar.info(
+        "Using built-in demo dataset"
+    )
+
+uploaded_file = st.sidebar.file_uploader(
+    "📂 Upload Marketing Dataset",
+    type=["csv"]
+)
+
+if uploaded_file is not None:
+
+    df_all = pd.read_csv(uploaded_file)
+
+    required_columns = [
+        "company",
+        "month_idx",
+        "channel",
+        "budget",
+        "impressions",
+        "clicks",
+        "conversions",
+        "revenue"
+    ]
+
+    missing_columns = [
+        col for col in required_columns
+        if col not in df_all.columns
+    ]
+
+    if missing_columns:
+        st.sidebar.error(
+            f"❌ Missing columns: {', '.join(missing_columns)}"
+        )
+        st.stop()
+
+    st.sidebar.success(
+        f"✅ {uploaded_file.name} uploaded successfully!"
+    )
+
+    st.sidebar.caption(
+        f"Rows: {len(df_all):,} | Columns: {len(df_all.columns)}"
+    )
+
+else:
+
+    df_all = load_all_data()
+
+    st.sidebar.info(
+        "Using built-in demo dataset"
+    )
 
 # ── SIDEBAR ───────────────────────────────────────────────────────────────────
 with st.sidebar:
