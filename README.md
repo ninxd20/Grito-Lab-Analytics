@@ -102,7 +102,11 @@ This project helps marketing teams:
 - Make data-driven investment decisions
 
 ---
+## 🖥️ Streamlit 
 
+Try it: https://ninad-grito-lab-analytics.streamlit.app/
+
+---
 ## 👨‍💻 Author
 
 Ninad Jagdish Tarwate
