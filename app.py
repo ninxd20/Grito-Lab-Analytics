@@ -981,55 +981,55 @@ with tab4:
     # ════════════════════════════════════════════════════════════════════
    with tab5:
 
-    st.header("🔮 Revenue Forecasting")
-
-    monthly_rev = (
-        df.groupby("month_idx")["revenue"]
-        .sum()
-        .reset_index()
-    )
-
-    X = monthly_rev[["month_idx"]]
-    y = monthly_rev["revenue"]
-
-    model = LinearRegression()
-
-    model.fit(X, y)
-
-    future = pd.DataFrame({
-        "month_idx":[13,14,15]
-    })
-
-    future["revenue"] = model.predict(future)
-
-    monthly_rev["Type"] = "Actual"
-
-    future["Type"] = "Forecast"
-
-    forecast_df = pd.concat([
-        monthly_rev,
-        future
-    ])
-
-    fig = px.line(
-        forecast_df,
-        x="month_idx",
-        y="revenue",
-        color="Type",
-        markers=True,
-        title="Next 3 Month Revenue Forecast"
-    )
-
-    fig.update_layout(
-        paper_bgcolor="#0f1117",
-        plot_bgcolor="#0f1117",
-        font_color="#d1d5db"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
+            st.header("🔮 Revenue Forecasting")
+    
+            monthly_rev = (
+            df.groupby("month_idx")["revenue"]
+            .sum()
+            .reset_index()
+            )
+    
+            X = monthly_rev[["month_idx"]]
+            y = monthly_rev["revenue"]
+        
+            model = LinearRegression()
+    
+            model.fit(X, y)
+        
+            future = pd.DataFrame({
+                "month_idx":[13,14,15]
+            })
+        
+            future["revenue"] = model.predict(future)
+        
+            monthly_rev["Type"] = "Actual"
+        
+            future["Type"] = "Forecast"
+        
+            forecast_df = pd.concat([
+                monthly_rev,
+                future
+            ])
+    
+            fig = px.line(
+                forecast_df,
+                x="month_idx",
+                y="revenue",
+                color="Type",
+                markers=True,
+                title="Next 3 Month Revenue Forecast"
+            )
+        
+            fig.update_layout(
+                paper_bgcolor="#0f1117",
+                plot_bgcolor="#0f1117",
+                font_color="#d1d5db"
+            )
+        
+            st.plotly_chart(
+                fig,
+                use_container_width=True
+            )
     
     # ════════════════════════════════════════════════════════════════════
     # TAB 6 —  Budget Scenario Simulator
