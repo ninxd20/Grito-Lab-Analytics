@@ -979,9 +979,9 @@ with tab4:
     # ════════════════════════════════════════════════════════════════════
     # TAB 5 — Revenue Forecasting
     # ════════════════════════════════════════════════════════════════════
-   with tab5:
+   with tab5 :
 
-            st.header("🔮 Revenue Forecasting")
+   st.header("🔮 Revenue Forecasting")
     
             monthly_rev = (
             df.groupby("month_idx")["revenue"]
