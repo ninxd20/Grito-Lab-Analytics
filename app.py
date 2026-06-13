@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from sklearn.linear_model import LinearRegression
 
 # ── PAGE CONFIG ──────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -22,12 +23,19 @@ st.markdown("""
     
     .main { background-color: #0f1117; }
     
-    .metric-card {
-        background: linear-gradient(135deg, #1a1f2e 0%, #141824 100%);
-        border: 1px solid #2d3348;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin: 8px 0;
+   .metric-card {
+    background: linear-gradient(135deg, #1a1f2e 0%, #141824 100%);
+    border: 1px solid #2d3348;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 8px 0;
+
+    transition: all 0.3s ease;
+    }
+
+.metric-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,212,255,.3);
     }
     .metric-val {
         font-size: 28px;
@@ -215,7 +223,15 @@ def load_all_data():
         dfs.append(generate_company_data(company, seed_offset=i * 10))
     return pd.concat(dfs, ignore_index=True)
 
-df_all = load_all_data()
+uploaded_file = st.sidebar.file_uploader(
+    "📂 Upload Marketing Dataset",
+    type=["csv"]
+)
+
+if uploaded_file is not None:
+    df_all = pd.read_csv(uploaded_file)
+else:
+    df_all = load_all_data()
 
 # ── SIDEBAR ───────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -272,11 +288,13 @@ with col_h2:
 st.divider()
 
 # ── TABS ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📈 Dashboard",
     "🔍 SQL Queries",
     "📐 Attribution Model",
-    "💡 Optimization Strategy"
+    "💡 Optimization Strategy",
+    "🔮 Forecasting",
+    "🎯 Scenario Simulator"
 ])
 
 # ════════════════════════════════════════════════════════════════════
@@ -293,7 +311,21 @@ with tab1:
     overall_roas  = total_revenue / max(total_budget, 1)
     overall_cpa   = total_budget / max(total_conv, 1)
     overall_ctr   = total_clicks / max(total_impr, 1) * 100
+    with st.expander("📋 Executive Summary", expanded=True):
 
+    st.success(
+        f"""
+        Revenue: ₹{total_revenue:,.0f}
+
+        Spend: ₹{total_budget:,.0f}
+
+        ROAS: {overall_roas:.2f}x
+
+        Conversions: {total_conv:,}
+
+        CTR: {overall_ctr:.2f}%
+        """
+    )
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
         st.metric("Total Spend", f"₹{total_budget/1e5:.2f}L", delta=None)
@@ -307,7 +339,67 @@ with tab1:
         st.metric("Avg CTR", f"{overall_ctr:.2f}%", delta=f"{total_clicks:,} clicks")
 
     st.markdown("---")
+    st.markdown("### 🎯 ROAS Performance")
 
+    fig_gauge = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=overall_roas,
+    title={"text":"Overall ROAS"},
+    gauge={
+        "axis":{"range":[0,8]},
+        "threshold":{
+            "line":{"color":"red","width":4},
+            "value":3.5
+            }
+        }
+    ))
+
+    fig_gauge.update_layout(
+    paper_bgcolor="#0f1117",
+    font_color="#d1d5db"
+    )
+
+    st.plotly_chart(
+    fig_gauge,
+    use_container_width=True
+    )
+   
+    st.markdown(
+    '<div class="section-header">Marketing Funnel</div>',
+    unsafe_allow_html=True
+    )
+
+    funnel_df = pd.DataFrame({
+    "Stage":[
+        "Impressions",
+        "Clicks",
+        "Conversions"
+    ],
+    "Value":[
+        total_impr,
+        total_clicks,
+        total_conv
+        ]
+    })
+
+    fig_funnel = px.funnel(
+    funnel_df,
+    x="Value",
+    y="Stage",
+    title="Conversion Funnel"
+    )
+
+    fig_funnel.update_layout(
+    paper_bgcolor="#0f1117",
+    plot_bgcolor="#0f1117",
+    font_color="#d1d5db"
+    )
+
+    st.plotly_chart(
+    fig_funnel,
+    use_container_width=True
+    )
+    
     # ROW 1 — Channel Performance
     st.markdown('<div class="section-header">Channel Performance Overview</div>', unsafe_allow_html=True)
     
@@ -882,8 +974,132 @@ with tab4:
     stable post-reallocation — actual results should be monitored weekly with a 30-day review checkpoint.
     </div>
     """, unsafe_allow_html=True)
+    
+    # ════════════════════════════════════════════════════════════════════
+    # TAB 5 — Revenue Forecasting
+    # ════════════════════════════════════════════════════════════════════
+    with tab5:
 
+    st.header("🔮 Revenue Forecasting")
 
+    monthly_rev = (
+        df.groupby("month_idx")["revenue"]
+        .sum()
+        .reset_index()
+    )
+
+    X = monthly_rev[["month_idx"]]
+    y = monthly_rev["revenue"]
+
+    model = LinearRegression()
+
+    model.fit(X, y)
+
+    future = pd.DataFrame({
+        "month_idx":[13,14,15]
+    })
+
+    future["revenue"] = model.predict(future)
+
+    monthly_rev["Type"] = "Actual"
+
+    future["Type"] = "Forecast"
+
+    forecast_df = pd.concat([
+        monthly_rev,
+        future
+    ])
+
+    fig = px.line(
+        forecast_df,
+        x="month_idx",
+        y="revenue",
+        color="Type",
+        markers=True,
+        title="Next 3 Month Revenue Forecast"
+    )
+
+    fig.update_layout(
+        paper_bgcolor="#0f1117",
+        plot_bgcolor="#0f1117",
+        font_color="#d1d5db"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+     
+    # ════════════════════════════════════════════════════════════════════
+    # TAB 6 —  Budget Scenario Simulator
+    # ════════════════════════════════════════════════════════════════════
+    with tab6:
+
+    st.header("🎯 Budget Scenario Simulator")
+
+    selected_channel = st.selectbox(
+        "Select Channel",
+        ch_summary["channel"]
+    )
+
+    budget_change = st.slider(
+        "Budget Change %",
+        -50,
+        100,
+        20
+    )
+
+    row = ch_summary[
+        ch_summary["channel"]
+        ==
+        selected_channel
+    ].iloc[0]
+
+    current_budget = row["budget"]
+
+    roas = row["roas"]
+
+    new_budget = (
+        current_budget
+        *
+        (1 + budget_change/100)
+    )
+
+    projected_revenue = (
+        new_budget
+        *
+        roas
+    )
+
+    c1,c2,c3 = st.columns(3)
+
+    c1.metric(
+        "Current Budget",
+        f"₹{current_budget:,.0f}"
+    )
+
+    c2.metric(
+        "New Budget",
+        f"₹{new_budget:,.0f}"
+    )
+
+    c3.metric(
+        "Projected Revenue",
+        f"₹{projected_revenue:,.0f}"
+    )
+
+    csv = df.to_csv(index=False)
+
+    st.download_button(
+    "⬇ Download Dataset",
+    csv,
+    "marketing_data.csv",
+    "text/csv"
+    )
+
+    if overall_roas > 4:
+    st.balloons()
+    
 # ── FOOTER ────────────────────────────────────────────────────────────────────
 st.divider()
 st.markdown("""
